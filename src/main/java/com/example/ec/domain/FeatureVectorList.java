@@ -19,7 +19,7 @@ public class FeatureVectorList {
         return _instance;
     }
 
-    ArrayList<FeatureVector> Get()
+    public ArrayList<FeatureVector> Get()
     {
         return fvList;
     }

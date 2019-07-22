@@ -47,6 +47,8 @@ public class ExplorecaliApplication implements CommandLineRunner {
 //		tourPackageService.createTourPackage("BC", "Backpack Cal");
 		featureVectorService.createFeatureVector( new FeatureVector(1l, new Long[]{1l,2l,3l}, 1l));
 		featureVectorService.createFeatureVector( new FeatureVector(2l, new Long[]{1l,2l,3l}, 2l));
+		featureVectorService.readFileForImages();
+		featureVectorService.readFileForFeatureVectors();
 		System.out.println("Number of feature vectors =" + featureVectorService.total());
 
 

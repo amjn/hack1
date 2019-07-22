@@ -18,7 +18,7 @@ public class FeatureSimilarityList {
         return _instance;
     }
 
-    ArrayList<FeatureSimilarity> Get()
+    public ArrayList<FeatureSimilarity> Get()
     {
         return fsList;
     }
