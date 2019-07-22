@@ -11,33 +11,45 @@ public class FeatureVector {
 
     @Id
     @GeneratedValue
-    private Integer id;
+    private Long id;
 
     @Column
-    private String featureVector;
+    private Long[] featureVector;
 
-    public FeatureVector(Integer id, String featureVector) {
-        this.id = id;
-        this.featureVector = featureVector;
-    }
+    @Column
+    private Long type;
 
     public FeatureVector() {
     }
 
-    public Integer getId() {
+    public FeatureVector(Long id, Long[] featureVector, Long type) {
+        this.id = id;
+        this.featureVector = featureVector;
+        this.type = type;
+    }
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public String getFeatureVector() {
+    public Long[] getFeatureVector() {
         return featureVector;
     }
 
-    public void setFeatureVector(String featureVector) {
+    public void setFeatureVector(Long[] featureVector) {
         this.featureVector = featureVector;
+    }
+
+    public Long getType() {
+        return type;
+    }
+
+    public void setType(Long type) {
+        this.type = type;
     }
 
     @Override

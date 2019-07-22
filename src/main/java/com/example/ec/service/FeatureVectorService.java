@@ -16,9 +16,9 @@ public class FeatureVectorService {
     }
 
 
-    public FeatureVector createFeatureVector(int id, String featureVector) {
-        if (featureVectorRepository.findOne(id) == null) {
-            return featureVectorRepository.save(new FeatureVector(id, featureVector));
+    public FeatureVector createFeatureVector(FeatureVector fv) {
+        if (featureVectorRepository.findOne(fv.getId()) == null) {
+            return featureVectorRepository.save(fv);
         } else {
             return null;
         }
