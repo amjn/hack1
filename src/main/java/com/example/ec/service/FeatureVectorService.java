@@ -77,7 +77,7 @@ public class FeatureVectorService {
             Map<String, Boolean> collect = visibleData.entrySet().stream()
                     .filter(x -> !x.getValue())
                     .collect(Collectors.toMap(x -> x.getKey(), x -> x.getValue()));
-            List<String> unlikedIds = (List<String>) collect.keySet();
+            List<String> unlikedIds = new ArrayList<> (collect.keySet());
             for (String id : unlikedIds) {
                 Long[] fv = getFeatureVectorForId(id);
                 cosineTemp.set(getCosineSimilarity(likedFv, fv));
@@ -133,7 +133,7 @@ public class FeatureVectorService {
         if (featureVector1 != null && featureVector2 != null && featureVector1.length == featureVector2.length)
         {
 
-            for (int i = 0; i < featureVector1.length; i++)
+            for (int i = 0; i < featureVector1.length-1; i++)
             {
                 output += featureVector1[i] * featureVector2[i];
             }
