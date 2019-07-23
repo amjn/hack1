@@ -13,11 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.util.ResourceUtils;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,15 +55,16 @@ public class ExplorecaliApplication implements CommandLineRunner {
 	}
 
 	private void readFileForImages() {
-		String csvFile = "C:/Users/snvemula/IdeaProjects/hack1/IdAndSimilarIds.csv";
+		try {
+		File file = ResourceUtils.getFile("classpath:IdAndSimilarIds.csv");
+		InputStream in = new FileInputStream(file);
 		BufferedReader br = null;
 		String line = "";
 		String cvsSplitBy = ",";
 		FeatureSimilarityMap map = FeatureSimilarityMap.getInstance();
 
-		try {
-
-			br = new BufferedReader(new FileReader(csvFile));
+			InputStreamReader inReader = new InputStreamReader(in);
+			br = new BufferedReader(inReader);
 			while ((line = br.readLine()) != null) {
 
 				// use comma as separator
@@ -82,28 +81,20 @@ public class ExplorecaliApplication implements CommandLineRunner {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} finally {
-			if (br != null) {
-				try {
-					br.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
 		}
 		//list.Get();
 	}
 
 	private void readFileForFeatureVectors() {
-		String csvFile = "C:/Users/snvemula/IdeaProjects/hack1/IdAndFeatureVectors.csv";
-		BufferedReader br = null;
-		String line = "";
-		String cvsSplitBy = ",";
-		FeatureVectorMap map = FeatureVectorMap.getInstance();
-
-		try {
-
-			br = new BufferedReader(new FileReader(csvFile));
+		try{
+			File file = ResourceUtils.getFile("classpath:IdAndFeatureVectors.csv");
+			InputStream in = new FileInputStream(file);
+			BufferedReader br = null;
+			String line = "";
+			String cvsSplitBy = ",";
+			FeatureVectorMap map = FeatureVectorMap.getInstance();
+			InputStreamReader inReader = new InputStreamReader(in);
+			br = new BufferedReader(inReader);
 			while ((line = br.readLine()) != null) {
 
 				// use comma as separator
@@ -120,14 +111,6 @@ public class ExplorecaliApplication implements CommandLineRunner {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} finally {
-			if (br != null) {
-				try {
-					br.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
 		}
 	}
 }
