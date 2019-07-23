@@ -65,7 +65,7 @@ public class FeatureVectorService {
     private ArrayList<Long> GetReplaceableIds(Map<Long, Boolean> visibleData, Long likedId)
     {
         ArrayList<Long> replaceableIds = new ArrayList<>();
-        int numUnliked = Collections.frequency(visibleData.values(), 0);
+        int numUnliked = Collections.frequency(visibleData.values(), false);
         Long[] likedFv = getFeatureVectorForId(likedId);
         double highestCosine = Double.MAX_VALUE; //highest
         double secondHighestCosine = Double.MAX_VALUE; //secondhighest
@@ -117,7 +117,7 @@ public class FeatureVectorService {
             Map<Long, Boolean> collect = visibleData.entrySet().stream()
                     .filter(x -> !x.getValue())
                     .collect(Collectors.toMap(x -> x.getKey(), x -> x.getValue()));
-            List<Long> unlikedIds = (List<Long>) collect.keySet();
+            List<Long> unlikedIds = new ArrayList<>(collect.keySet());
             replaceableIds.addAll(unlikedIds);
         }
 
