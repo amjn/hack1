@@ -73,7 +73,7 @@ public class ExplorecaliApplication implements CommandLineRunner {
 				for(int i=1;i<imageIds.length;i++){
 					similarIds.add(imageIds[i]);
 				}
-				map.Get().put(imageIds[0], new FeatureSimilarity(Long.parseLong(imageIds[0]), similarIds));
+				map.Get().put(imageIds[0], new FeatureSimilarity(similarIds));
 
 			}
 

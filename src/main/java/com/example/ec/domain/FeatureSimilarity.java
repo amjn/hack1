@@ -20,8 +20,7 @@ public class FeatureSimilarity {
     public FeatureSimilarity()
     {}
 
-    public FeatureSimilarity(Long id, ArrayList<String> similarIds) {
-        this.id = id;
+    public FeatureSimilarity(ArrayList<String> similarIds) {
         this.similarIds = similarIds;
     }
 
