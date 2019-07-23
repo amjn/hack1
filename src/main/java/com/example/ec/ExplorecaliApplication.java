@@ -1,6 +1,6 @@
 package com.example.ec;
 
-import com.example.ec.domain.FeatureVector;
+import com.example.ec.domain.FeatureVectorWithType;
 import com.example.ec.service.FeatureVectorService;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -45,8 +45,8 @@ public class ExplorecaliApplication implements CommandLineRunner {
 	public void run(String... strings) throws Exception {
 		//Create the default tour packages
 //		tourPackageService.createTourPackage("BC", "Backpack Cal");
-		featureVectorService.createFeatureVector( new FeatureVector(1l, new Long[]{1l,2l,3l}, 1l));
-		featureVectorService.createFeatureVector( new FeatureVector(2l, new Long[]{1l,2l,3l}, 2l));
+		//featureVectorService.createFeatureVector( new FeatureVectorWithType(1l, new Long[]{1l,2l,3l}, 1l));
+		//featureVectorService.createFeatureVector( new FeatureVector(2l, new Long[]{1l,2l,3l}, 2l));
 		featureVectorService.readFileForImages();
 		featureVectorService.readFileForFeatureVectors();
 		System.out.println("Number of feature vectors =" + featureVectorService.total());
