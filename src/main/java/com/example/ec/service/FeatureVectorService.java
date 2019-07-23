@@ -3,14 +3,17 @@ package com.example.ec.service;
 
 import com.example.ec.domain.FeatureSimilarity;
 import com.example.ec.domain.FeatureSimilarityList;
-import com.example.ec.domain.FeatureVector;
-import com.example.ec.domain.FeatureVectorList;
+import com.example.ec.domain.FeatureVectorWithType;
+import com.example.ec.domain.FeatureVectorMap;
+import com.example.ec.domain.FeatureVectorMap;
+import com.example.ec.domain.FeatureVectorWithType;
 import com.example.ec.repo.FeatureVectorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 @Service
 public class FeatureVectorService {
@@ -22,13 +25,13 @@ public class FeatureVectorService {
     }
 
 
-    public FeatureVector createFeatureVector(FeatureVector fv) {
-        if (featureVectorRepository.findOne(fv.getId()) == null) {
-            return featureVectorRepository.save(fv);
-        } else {
-            return null;
-        }
-    }
+//    public FeatureVector createFeatureVector(FeatureVector fv) {
+//        if (featureVectorRepository.findOne(fv.getId()) == null) {
+//            return featureVectorRepository.save(fv);
+//        } else {
+//            return null;
+//        }
+//    }
 
     public void readFileForImages() {
         String csvFile = "C:/Users/snvemula/IdeaProjects/hack1/IdAndSimilarIds.csv";
@@ -73,7 +76,7 @@ public class FeatureVectorService {
         BufferedReader br = null;
         String line = "";
         String cvsSplitBy = ",";
-        FeatureVectorList list = FeatureVectorList.getInstance();
+        FeatureVectorMap map = FeatureVectorMap.getInstance();
 
         try {
 
@@ -86,7 +89,7 @@ public class FeatureVectorService {
                 for(int i=1;i<strings.length-2;i++){
                     fv[i-1] = Long.parseLong(strings[i]);
                 }
-                list.Get().add(new FeatureVector(Long.parseLong(strings[0]), fv, Long.parseLong(strings[strings.length-1])));
+                map.Get().put(Long.parseLong(strings[0]), (new FeatureVectorWithType(fv, Long.parseLong(strings[strings.length-1]))));
 
             }
 
@@ -105,6 +108,98 @@ public class FeatureVectorService {
         }
        // System.out.println(list.Get().size()+"ssssssssss");
     }
+
+    public Map<Long, Long> getReplacementContext(Map<Long, Long> visibleData, Long likedId)
+    {
+        Map<Long, Long> replacements = new HashMap<>();
+
+        ArrayList<Long> ids =  GetReplaceableIds(visibleData, likedId);
+        if (ids.size() > 0)
+        {
+//            TODO: find the top similar ones which are not in the visible list
+        }
+
+
+
+        return replacements;
+    }
+
+    public Long[] getFeatureVectorForId(Long imageId) {
+        return FeatureVectorMap.getInstance().getFeatureVectorForId(imageId);
+    }
+
+    private ArrayList<Long> GetReplaceableIds(Map<Long, Long> visibleData, Long likedId)
+    {
+        ArrayList<Long> replaceableIds = new ArrayList<>();
+        int numUnliked = Collections.frequency(visibleData.values(), 0);
+        Long[] likedFv = getFeatureVectorForId(likedId);
+        double highestCosine1 = Double.MAX_VALUE;
+        double highestCosine2 = Double.MAX_VALUE;
+        Long id1 = null, id2 = null;
+        AtomicReference<Double> cosineTemp = new AtomicReference<>((double) 0);
+        if (numUnliked > 2)
+        {
+            // get unliked ones
+            Map<Long, Long> collect = visibleData.entrySet().stream()
+                    .filter(x -> x.getValue() == 0)
+                    .collect(Collectors.toMap(x -> x.getKey(), x -> x.getValue()));
+            List<Long> unlikedIds = (List<Long>) collect.keySet();
+            for (Long id : unlikedIds) {
+                Long[] fv = getFeatureVectorForId(id);
+                cosineTemp.set(getCosineSimilarity(likedFv, fv));
+                if (highestCosine1 == Double.MAX_VALUE) {
+                    highestCosine1 = cosineTemp.get();
+                    id1 = id;
+                } else if(highestCosine2 == Double.MAX_VALUE) {
+                    highestCosine2 = cosineTemp.get();
+                    id2 = id;
+                } else if(cosineTemp.get() > highestCosine1){
+                    highestCosine1 = cosineTemp.get();
+                    id1 = id;
+                } else if(cosineTemp.get() > highestCosine2) {
+                    highestCosine2 = cosineTemp.get();
+                    id2 = id;
+                }
+            }
+            replaceableIds.add(id1);
+            replaceableIds.add(id2);
+
+        }
+        else if (numUnliked > 0 && numUnliked <= 2)
+        {
+            for (Map.Entry<Long, Long> entry : visibleData.entrySet()) {
+                if (entry.getValue() == 0)
+                {
+                    replaceableIds.add(entry.getKey());
+                }
+
+            }
+        }
+
+        return replaceableIds;
+    }
+
+    private double getCosineSimilarity(Long[] featureVector1, Long[] featureVector2)
+    {
+        double output = 0;
+        double degrees = 45.0;
+        double radians = Math.toRadians(degrees);
+
+        if (featureVector1 != null && featureVector2 != null && featureVector1.length == featureVector2.length)
+        {
+
+            for (int i = 0; i < featureVector1.length; i++)
+            {
+                output += featureVector1[i] * featureVector2[i];
+            }
+            output *= Math.cos(radians);
+        }else
+        {
+            System.out.println(" Invalid vector found");
+        }
+        return output;
+    }
+
 
     public long total() {
         return featureVectorRepository.count();
