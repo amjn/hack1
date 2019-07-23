@@ -67,8 +67,8 @@ public class FeatureVectorService {
         ArrayList<Long> replaceableIds = new ArrayList<>();
         int numUnliked = Collections.frequency(visibleData.values(), 0);
         Long[] likedFv = getFeatureVectorForId(likedId);
-        double highestCosine1 = Double.MAX_VALUE;
-        double highestCosine2 = Double.MAX_VALUE;
+        double highestCosine = Double.MAX_VALUE; //highest
+        double secondHighestCosine = Double.MAX_VALUE; //secondhighest
         Long id1 = null, id2 = null;
         AtomicReference<Double> cosineTemp = new AtomicReference<>((double) 0);
         if (numUnliked > 2)
@@ -81,17 +81,30 @@ public class FeatureVectorService {
             for (Long id : unlikedIds) {
                 Long[] fv = getFeatureVectorForId(id);
                 cosineTemp.set(getCosineSimilarity(likedFv, fv));
-                if (highestCosine1 == Double.MAX_VALUE) {
-                    highestCosine1 = cosineTemp.get();
+                if (highestCosine == Double.MAX_VALUE) {
+                    highestCosine = cosineTemp.get();
                     id1 = id;
-                } else if(highestCosine2 == Double.MAX_VALUE) {
-                    highestCosine2 = cosineTemp.get();
-                    id2 = id;
-                } else if(cosineTemp.get() > highestCosine1){
-                    highestCosine1 = cosineTemp.get();
+                } else if(secondHighestCosine == Double.MAX_VALUE) {
+                    if(highestCosine < cosineTemp.get()){
+                        double tempCosine = highestCosine;
+                        Long tempId = id1;
+                        highestCosine = cosineTemp.get();
+                        id1 = id;
+                        secondHighestCosine=tempCosine;
+                        id2=tempId;
+                    } else {
+                        secondHighestCosine = cosineTemp.get();
+                        id2 = id;
+                    }
+                } else if(cosineTemp.get() > highestCosine){
+                    double tempCosine = highestCosine;
+                    Long tempId = id1;
+                    highestCosine = cosineTemp.get();
                     id1 = id;
-                } else if(cosineTemp.get() > highestCosine2) {
-                    highestCosine2 = cosineTemp.get();
+                    secondHighestCosine=tempCosine;
+                    id2=tempId;
+                } else if(cosineTemp.get() > secondHighestCosine) {
+                    secondHighestCosine = cosineTemp.get();
                     id2 = id;
                 }
             }
@@ -101,13 +114,11 @@ public class FeatureVectorService {
         }
         else if (numUnliked > 0 && numUnliked <= 2)
         {
-            for (Map.Entry<Long, Long> entry : visibleData.entrySet()) {
-                if (entry.getValue() == 0)
-                {
-                    replaceableIds.add(entry.getKey());
-                }
-
-            }
+            Map<Long, Long> collect = visibleData.entrySet().stream()
+                    .filter(x -> x.getValue() == 0)
+                    .collect(Collectors.toMap(x -> x.getKey(), x -> x.getValue()));
+            List<Long> unlikedIds = (List<Long>) collect.keySet();
+            replaceableIds.addAll(unlikedIds);
         }
 
         return replaceableIds;
