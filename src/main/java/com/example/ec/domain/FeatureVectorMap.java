@@ -7,7 +7,7 @@ import java.util.Map;
 public class FeatureVectorMap {
 
     private static FeatureVectorMap _instance = null;
-    private Map<Long, FeatureVectorWithType> fvMap = new HashMap<Long, FeatureVectorWithType>();
+    private Map<String, FeatureVectorWithType> fvMap = new HashMap<String, FeatureVectorWithType>();
 
     private FeatureVectorMap(){}
 
@@ -21,12 +21,12 @@ public class FeatureVectorMap {
         return _instance;
     }
 
-    public Map<Long, FeatureVectorWithType> Get()
+    public Map<String, FeatureVectorWithType> Get()
     {
         return fvMap;
     }
 
-    public Long[] getFeatureVectorForId(Long imageId) {
+    public Long[] getFeatureVectorForId(String imageId) {
         return fvMap.get(imageId).getFeatureVector(); //null check
     }
 

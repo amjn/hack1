@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class FeatureSimilarityMap {
     private static FeatureSimilarityMap _instance = null;
-    private Map<Long, FeatureSimilarity> fsMap = new HashMap<>();
+    private Map<String, FeatureSimilarity> fsMap = new HashMap<>();
 
     private FeatureSimilarityMap(){}
 
@@ -19,7 +19,7 @@ public class FeatureSimilarityMap {
         return _instance;
     }
 
-    public Map<Long, FeatureSimilarity> Get()
+    public Map<String, FeatureSimilarity> Get()
     {
         return fsMap;
     }

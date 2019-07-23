@@ -27,7 +27,7 @@ public class FeatureVectorController {
 
     @RequestMapping(method = RequestMethod.POST, path = "/liked/{selectedId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public Map<Integer, Integer> getRecommendations(@PathVariable(value = "selectedId") long likedId, @RequestBody Map<Long, Boolean> visibleData) {
+    public Map<Integer, Integer> getRecommendations(@PathVariable(value = "selectedId") String likedId, @RequestBody Map<String, Boolean> visibleData) {
         Map map = service.getReplacementContext(visibleData, likedId);
         return map;
     }

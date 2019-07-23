@@ -15,12 +15,12 @@ public class FeatureSimilarity {
     private Long id;
 
     @Column
-    private ArrayList<Long> similarIds;
+    private ArrayList<String> similarIds;
 
     public FeatureSimilarity()
     {}
 
-    public FeatureSimilarity(Long id, ArrayList<Long> similarIds) {
+    public FeatureSimilarity(Long id, ArrayList<String> similarIds) {
         this.id = id;
         this.similarIds = similarIds;
     }
@@ -33,11 +33,11 @@ public class FeatureSimilarity {
         this.id = id;
     }
 
-    public ArrayList<Long> getSimilarIds() {
+    public ArrayList<String> getSimilarIds() {
         return similarIds;
     }
 
-    public void setSimilarIds(ArrayList<Long> similarIds) {
+    public void setSimilarIds(ArrayList<String> similarIds) {
         this.similarIds = similarIds;
     }
 

@@ -22,23 +22,23 @@ public class FeatureVectorService {
         this.featureVectorRepository = featureVectorRepository;
     }
 
-    public Map<Long, Long> getReplacementContext(Map<Long, Boolean> visibleData, Long likedId)
+    public Map<String, String> getReplacementContext(Map<String, Boolean> visibleData, String likedId)
     {
-        Map<Long, Long> replacements = new HashMap<>();
+        Map<String, String> replacements = new HashMap<>();
 
-        ArrayList<Long> replaceableIds =  GetReplaceableIds(visibleData, likedId);
+        ArrayList<String> replaceableIds =  GetReplaceableIds(visibleData, likedId);
         if (replaceableIds.size() > 0)
         {
-//            TODO: find the top similar ones which are not in the visible list
+//           find the top similar ones which are not in the visible list
             FeatureSimilarityMap featureSimilarityMap = FeatureSimilarityMap.getInstance();
-            Map<Long, FeatureSimilarity> fsMap = featureSimilarityMap.Get();
+            Map<String, FeatureSimilarity> fsMap = featureSimilarityMap.Get();
 
             if (fsMap.containsKey(likedId))
             {
-                ArrayList<Long> similarIds = fsMap.get(likedId).getSimilarIds();
+                ArrayList<String> similarIds = fsMap.get(likedId).getSimilarIds();
                 if (similarIds != null)
                 {
-                    for (Long id: similarIds)
+                    for (String id: similarIds)
                     {
                         if (!visibleData.containsKey(id))
                         {
@@ -58,27 +58,27 @@ public class FeatureVectorService {
         return replacements;
     }
 
-    private Long[] getFeatureVectorForId(Long imageId) {
+    private Long[] getFeatureVectorForId(String imageId) {
         return FeatureVectorMap.getInstance().getFeatureVectorForId(imageId);
     }
 
-    private ArrayList<Long> GetReplaceableIds(Map<Long, Boolean> visibleData, Long likedId)
+    private ArrayList<String> GetReplaceableIds(Map<String, Boolean> visibleData, String likedId)
     {
-        ArrayList<Long> replaceableIds = new ArrayList<>();
+        ArrayList<String> replaceableIds = new ArrayList<>();
         int numUnliked = Collections.frequency(visibleData.values(), false);
         Long[] likedFv = getFeatureVectorForId(likedId);
         double highestCosine = Double.MAX_VALUE; //highest
         double secondHighestCosine = Double.MAX_VALUE; //secondhighest
-        Long id1 = null, id2 = null;
+        String id1 = null, id2 = null;
         AtomicReference<Double> cosineTemp = new AtomicReference<>((double) 0);
         if (numUnliked > 2)
         {
             // get unliked ones
-            Map<Long, Boolean> collect = visibleData.entrySet().stream()
+            Map<String, Boolean> collect = visibleData.entrySet().stream()
                     .filter(x -> !x.getValue())
                     .collect(Collectors.toMap(x -> x.getKey(), x -> x.getValue()));
-            List<Long> unlikedIds = (List<Long>) collect.keySet();
-            for (Long id : unlikedIds) {
+            List<String> unlikedIds = (List<String>) collect.keySet();
+            for (String id : unlikedIds) {
                 Long[] fv = getFeatureVectorForId(id);
                 cosineTemp.set(getCosineSimilarity(likedFv, fv));
                 if (highestCosine == Double.MAX_VALUE) {
@@ -87,22 +87,22 @@ public class FeatureVectorService {
                 } else if(secondHighestCosine == Double.MAX_VALUE) {
                     if(highestCosine < cosineTemp.get()){
                         double tempCosine = highestCosine;
-                        Long tempId = id1;
+                        String tempId = id1;
                         highestCosine = cosineTemp.get();
                         id1 = id;
-                        secondHighestCosine=tempCosine;
-                        id2=tempId;
+                        secondHighestCosine = tempCosine;
+                        id2 = tempId;
                     } else {
                         secondHighestCosine = cosineTemp.get();
                         id2 = id;
                     }
                 } else if(cosineTemp.get() > highestCosine){
                     double tempCosine = highestCosine;
-                    Long tempId = id1;
+                    String tempId = id1;
                     highestCosine = cosineTemp.get();
                     id1 = id;
-                    secondHighestCosine=tempCosine;
-                    id2=tempId;
+                    secondHighestCosine = tempCosine;
+                    id2 = tempId;
                 } else if(cosineTemp.get() > secondHighestCosine) {
                     secondHighestCosine = cosineTemp.get();
                     id2 = id;
@@ -114,10 +114,10 @@ public class FeatureVectorService {
         }
         else if (numUnliked > 0 && numUnliked <= 2)
         {
-            Map<Long, Boolean> collect = visibleData.entrySet().stream()
+            Map<String, Boolean> collect = visibleData.entrySet().stream()
                     .filter(x -> !x.getValue())
                     .collect(Collectors.toMap(x -> x.getKey(), x -> x.getValue()));
-            List<Long> unlikedIds = new ArrayList<>(collect.keySet());
+            List<String> unlikedIds = new ArrayList<>(collect.keySet());
             replaceableIds.addAll(unlikedIds);
         }
 

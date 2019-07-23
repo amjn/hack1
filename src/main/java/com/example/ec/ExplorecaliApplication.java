@@ -69,11 +69,11 @@ public class ExplorecaliApplication implements CommandLineRunner {
 
 				// use comma as separator
 				String[] imageIds = line.split(cvsSplitBy);
-				ArrayList<Long> similarIds = new ArrayList<>();
+				ArrayList<String> similarIds = new ArrayList<>();
 				for(int i=1;i<imageIds.length;i++){
-					similarIds.add(Long.parseLong(imageIds[i]));
+					similarIds.add(imageIds[i]);
 				}
-				map.Get().put(Long.parseLong(imageIds[0]), new FeatureSimilarity(Long.parseLong(imageIds[0]), similarIds));
+				map.Get().put(imageIds[0], new FeatureSimilarity(Long.parseLong(imageIds[0]), similarIds));
 
 			}
 
@@ -103,7 +103,7 @@ public class ExplorecaliApplication implements CommandLineRunner {
 				for(int i=1;i<strings.length-2;i++){
 					fv[i-1] = Long.parseLong(strings[i]);
 				}
-				map.Get().put(Long.parseLong(strings[0]), (new FeatureVectorWithType(fv, Long.parseLong(strings[strings.length-1]))));
+				map.Get().put(strings[0], (new FeatureVectorWithType(fv, Long.parseLong(strings[strings.length-1]))));
 
 			}
 
