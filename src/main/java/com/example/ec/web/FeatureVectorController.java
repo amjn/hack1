@@ -67,6 +67,31 @@ public class FeatureVectorController {
         return json;
     }
 
+    @RequestMapping(method = RequestMethod.POST, path = "/disliked/{selectedId:.+}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public @ResponseBody String getRecommendationsForDislike(@PathVariable(value = "selectedId") String dislikedId,
+                                                             @RequestBody Map<String, Boolean> visibleData) {
+        Map<String, String> map = service.getDislikedReplacementContext(visibleData, dislikedId);
+
+        List<Replace> replaceList = new ArrayList<>();
+        Replace replace;
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+            replace = new Replace(entry.getKey(), entry.getValue());
+            replaceList.add(replace);
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        String json = "";
+        try {
+            json = mapper.writeValueAsString(replaceList);
+        } catch (JsonProcessingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return json;
+    }
+
 
 
 }

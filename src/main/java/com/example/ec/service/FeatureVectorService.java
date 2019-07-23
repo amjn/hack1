@@ -1,10 +1,7 @@
 package com.example.ec.service;
 
 
-import com.example.ec.domain.FeatureSimilarity;
-import com.example.ec.domain.FeatureSimilarityMap;
-import com.example.ec.domain.FeatureVectorWithType;
-import com.example.ec.domain.FeatureVectorMap;
+import com.example.ec.domain.*;
 import com.example.ec.repo.FeatureVectorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,6 +46,44 @@ public class FeatureVectorService {
                            }else {
                                break;
                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return replacements;
+    }
+
+    public Map<String, String> getDislikedReplacementContext(Map<String, Boolean> visibleData, String dislikedId)
+    {
+        Map<String, String> replacements = new HashMap<>();
+
+        ArrayList<String> replaceableIds =  GetReplaceableIdsForDislike(visibleData, dislikedId);
+        replaceableIds.add(dislikedId);
+        // disliked Id will always be the one to be replaced
+        if (replaceableIds.size() > 1)
+        {
+//           find the top dissimilar ones which are not in the visible list
+            FeatureDissimilarityMap featureDissimilarityMap = FeatureDissimilarityMap.getInstance();
+            Map<String, FeatureDissimilarity> fsMap = featureDissimilarityMap.Get();
+
+            if (fsMap.containsKey(dislikedId))
+            {
+                ArrayList<String> dissimilarIds = fsMap.get(dislikedId).getDissimilarIds();
+                if (dissimilarIds != null)
+                {
+                    for (String id: dissimilarIds)
+                    {
+                        if (!visibleData.containsKey(id))
+                        {
+                            if (replaceableIds.size() > 0)
+                            {
+                                replacements.put(replaceableIds.get(0), id);
+                                replaceableIds.remove(0);
+                            }else {
+                                break;
+                            }
                         }
                     }
                 }
@@ -105,6 +140,68 @@ public class FeatureVectorService {
                     id2 = tempId;
                 } else if(cosineTemp.get() > secondHighestCosine) {
                     secondHighestCosine = cosineTemp.get();
+                    id2 = id;
+                }
+            }
+            replaceableIds.add(id1);
+            replaceableIds.add(id2);
+
+        }
+        else if (numUnliked > 0 && numUnliked <= 2)
+        {
+            Map<String, Boolean> collect = visibleData.entrySet().stream()
+                    .filter(x -> !x.getValue())
+                    .collect(Collectors.toMap(x -> x.getKey(), x -> x.getValue()));
+            List<String> unlikedIds = new ArrayList<>(collect.keySet());
+            replaceableIds.addAll(unlikedIds);
+        }
+
+        return replaceableIds;
+    }
+
+    private ArrayList<String> GetReplaceableIdsForDislike(Map<String, Boolean> visibleData, String dislikedId)
+    {
+        ArrayList<String> replaceableIds = new ArrayList<>();
+        int numUnliked = Collections.frequency(visibleData.values(), false);
+        Long[] likedFv = getFeatureVectorForId(dislikedId);
+        double leastCosine = Double.MIN_VALUE;
+        double secondleastCosine = Double.MIN_VALUE;
+        String id1 = null, id2 = null;
+        AtomicReference<Double> cosineTemp = new AtomicReference<>((double) 0);
+        if (numUnliked > 2)
+        {
+            // get unliked ones
+            Map<String, Boolean> collect = visibleData.entrySet().stream()
+                    .filter(x -> !x.getValue())
+                    .collect(Collectors.toMap(x -> x.getKey(), x -> x.getValue()));
+            List<String> unlikedIds = new ArrayList<> (collect.keySet());
+            for (String id : unlikedIds) {
+                Long[] fv = getFeatureVectorForId(id);
+                cosineTemp.set(getCosineSimilarity(likedFv, fv));
+                if (leastCosine == Double.MIN_VALUE) {
+                    leastCosine = cosineTemp.get();
+                    id1 = id;
+                } else if(secondleastCosine == Double.MIN_VALUE) {
+                    if(leastCosine > cosineTemp.get()){
+                        double tempCosine = leastCosine;
+                        String tempId = id1;
+                        leastCosine = cosineTemp.get();
+                        id1 = id;
+                        secondleastCosine = tempCosine;
+                        id2 = tempId;
+                    } else {
+                        secondleastCosine = cosineTemp.get();
+                        id2 = id;
+                    }
+                } else if(cosineTemp.get() < leastCosine){
+                    double tempCosine = leastCosine;
+                    String tempId = id1;
+                    leastCosine = cosineTemp.get();
+                    id1 = id;
+                    secondleastCosine = tempCosine;
+                    id2 = tempId;
+                } else if(cosineTemp.get() < secondleastCosine) {
+                    secondleastCosine = cosineTemp.get();
                     id2 = id;
                 }
             }

@@ -1,9 +1,6 @@
 package com.example.ec;
 
-import com.example.ec.domain.FeatureSimilarity;
-import com.example.ec.domain.FeatureSimilarityMap;
-import com.example.ec.domain.FeatureVectorMap;
-import com.example.ec.domain.FeatureVectorWithType;
+import com.example.ec.domain.*;
 import com.example.ec.service.FeatureVectorService;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -49,6 +46,7 @@ public class ExplorecaliApplication implements CommandLineRunner {
 	@Override
 	public void run(String... strings) throws Exception {
 		readFileForImages();
+		readFileForDissimilarImages();
 		readFileForFeatureVectors();
 		System.out.println("Number of feature vectors =" + featureVectorService.total());
 
@@ -83,6 +81,37 @@ public class ExplorecaliApplication implements CommandLineRunner {
 			e.printStackTrace();
 		}
 		//list.Get();
+	}
+
+	private void readFileForDissimilarImages() {
+		try {
+			File file = ResourceUtils.getFile("classpath:IdAndDissimilarIds.csv");
+			InputStream in = new FileInputStream(file);
+			BufferedReader br = null;
+			String line = "";
+			String cvsSplitBy = ",";
+			FeatureDissimilarityMap map = FeatureDissimilarityMap.getInstance();
+
+			InputStreamReader inReader = new InputStreamReader(in);
+			br = new BufferedReader(inReader);
+			while ((line = br.readLine()) != null) {
+
+				// use comma as separator
+				String[] imageIds = line.split(cvsSplitBy);
+				ArrayList<String> similarIds = new ArrayList<>();
+				for(int i=1;i<imageIds.length;i++){
+					similarIds.add(imageIds[i]);
+				}
+				map.Get().put(imageIds[0], new FeatureDissimilarity(similarIds));
+
+			}
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		//;
 	}
 
 	private void readFileForFeatureVectors() {
