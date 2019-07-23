@@ -22,7 +22,7 @@ public class FeatureVectorService {
         this.featureVectorRepository = featureVectorRepository;
     }
 
-    public Map<Long, Long> getReplacementContext(Map<Long, Long> visibleData, Long likedId)
+    public Map<Long, Long> getReplacementContext(Map<Long, Boolean> visibleData, Long likedId)
     {
         Map<Long, Long> replacements = new HashMap<>();
 
@@ -62,7 +62,7 @@ public class FeatureVectorService {
         return FeatureVectorMap.getInstance().getFeatureVectorForId(imageId);
     }
 
-    private ArrayList<Long> GetReplaceableIds(Map<Long, Long> visibleData, Long likedId)
+    private ArrayList<Long> GetReplaceableIds(Map<Long, Boolean> visibleData, Long likedId)
     {
         ArrayList<Long> replaceableIds = new ArrayList<>();
         int numUnliked = Collections.frequency(visibleData.values(), 0);
@@ -74,8 +74,8 @@ public class FeatureVectorService {
         if (numUnliked > 2)
         {
             // get unliked ones
-            Map<Long, Long> collect = visibleData.entrySet().stream()
-                    .filter(x -> x.getValue() == 0)
+            Map<Long, Boolean> collect = visibleData.entrySet().stream()
+                    .filter(x -> !x.getValue())
                     .collect(Collectors.toMap(x -> x.getKey(), x -> x.getValue()));
             List<Long> unlikedIds = (List<Long>) collect.keySet();
             for (Long id : unlikedIds) {
@@ -114,8 +114,8 @@ public class FeatureVectorService {
         }
         else if (numUnliked > 0 && numUnliked <= 2)
         {
-            Map<Long, Long> collect = visibleData.entrySet().stream()
-                    .filter(x -> x.getValue() == 0)
+            Map<Long, Boolean> collect = visibleData.entrySet().stream()
+                    .filter(x -> !x.getValue())
                     .collect(Collectors.toMap(x -> x.getKey(), x -> x.getValue()));
             List<Long> unlikedIds = (List<Long>) collect.keySet();
             replaceableIds.addAll(unlikedIds);
