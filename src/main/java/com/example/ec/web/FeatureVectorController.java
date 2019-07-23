@@ -1,6 +1,7 @@
 package com.example.ec.web;
 
 import com.example.ec.repo.FeatureVectorRepository;
+import com.example.ec.service.FeatureVectorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -10,28 +11,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping(path = "/feature-vectors/{selectedId}")
+@RequestMapping(path = "/GetRecommendations")
 public class FeatureVectorController {
 
-    FeatureVectorRepository repository;
+    FeatureVectorService service;
 
     @Autowired
-    public FeatureVectorController(FeatureVectorRepository repository) {
-        this.repository = repository;
+    public FeatureVectorController(FeatureVectorService service) {
+        this.service = service;
     }
 
     protected FeatureVectorController() {
 
     }
 
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST, path = "/liked/{selectedId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public Map<Integer, Integer> getRecommendations(@PathVariable(value = "selectedId") int tourId, @RequestBody FeatureVectorDto dto) {
-
-        Map map = new HashMap<>();
-        map.put(1,1);
-        map.put(2,2);
+    public Map<Integer, Integer> getRecommendations(@PathVariable(value = "selectedId") long likedId, @RequestBody Map<Long, Long> visibleData) {
+        Map map = service.getReplacementContext(visibleData, likedId);
         return map;
-
     }
+
+
+
 }

@@ -2,11 +2,9 @@ package com.example.ec.service;
 
 
 import com.example.ec.domain.FeatureSimilarity;
-import com.example.ec.domain.FeatureSimilarityList;
+import com.example.ec.domain.FeatureSimilarityMap;
 import com.example.ec.domain.FeatureVectorWithType;
 import com.example.ec.domain.FeatureVectorMap;
-import com.example.ec.domain.FeatureVectorMap;
-import com.example.ec.domain.FeatureVectorWithType;
 import com.example.ec.repo.FeatureVectorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,107 +22,43 @@ public class FeatureVectorService {
         this.featureVectorRepository = featureVectorRepository;
     }
 
-
-//    public FeatureVector createFeatureVector(FeatureVector fv) {
-//        if (featureVectorRepository.findOne(fv.getId()) == null) {
-//            return featureVectorRepository.save(fv);
-//        } else {
-//            return null;
-//        }
-//    }
-
-    public void readFileForImages() {
-        String csvFile = "C:/Users/snvemula/IdeaProjects/hack1/IdAndSimilarIds.csv";
-        BufferedReader br = null;
-        String line = "";
-        String cvsSplitBy = ",";
-        FeatureSimilarityList list = FeatureSimilarityList.getInstance();
-
-        try {
-
-            br = new BufferedReader(new FileReader(csvFile));
-            while ((line = br.readLine()) != null) {
-
-                // use comma as separator
-                String[] imageIds = line.split(cvsSplitBy);
-                ArrayList<Long> similarIds = new ArrayList<>();
-                for(int i=1;i<imageIds.length;i++){
-                    similarIds.add(Long.parseLong(imageIds[i]));
-                }
-                list.Get().add(new FeatureSimilarity(Long.parseLong(imageIds[0]), similarIds));
-
-            }
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        //list.Get();
-    }
-
-    public void readFileForFeatureVectors() {
-        String csvFile = "C:/Users/snvemula/IdeaProjects/hack1/IdAndFeatureVectors.csv";
-        BufferedReader br = null;
-        String line = "";
-        String cvsSplitBy = ",";
-        FeatureVectorMap map = FeatureVectorMap.getInstance();
-
-        try {
-
-            br = new BufferedReader(new FileReader(csvFile));
-            while ((line = br.readLine()) != null) {
-
-                // use comma as separator
-                String[] strings = line.split(cvsSplitBy);
-                Long[] fv = new Long[1024];
-                for(int i=1;i<strings.length-2;i++){
-                    fv[i-1] = Long.parseLong(strings[i]);
-                }
-                map.Get().put(Long.parseLong(strings[0]), (new FeatureVectorWithType(fv, Long.parseLong(strings[strings.length-1]))));
-
-            }
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-       // System.out.println(list.Get().size()+"ssssssssss");
-    }
-
     public Map<Long, Long> getReplacementContext(Map<Long, Long> visibleData, Long likedId)
     {
         Map<Long, Long> replacements = new HashMap<>();
 
-        ArrayList<Long> ids =  GetReplaceableIds(visibleData, likedId);
-        if (ids.size() > 0)
+        ArrayList<Long> replaceableIds =  GetReplaceableIds(visibleData, likedId);
+        if (replaceableIds.size() > 0)
         {
 //            TODO: find the top similar ones which are not in the visible list
+            FeatureSimilarityMap featureSimilarityMap = FeatureSimilarityMap.getInstance();
+            Map<Long, FeatureSimilarity> fsMap = featureSimilarityMap.Get();
+
+            if (fsMap.containsKey(likedId))
+            {
+                ArrayList<Long> similarIds = fsMap.get(likedId).getSimilarIds();
+                if (similarIds != null)
+                {
+                    for (Long id: similarIds)
+                    {
+                        if (!visibleData.containsKey(id))
+                        {
+                           if (replaceableIds.size() > 0)
+                           {
+                              replacements.put(replaceableIds.get(0), id);
+                              replaceableIds.remove(0);
+                           }else {
+                               break;
+                           }
+                        }
+                    }
+                }
+            }
         }
-
-
 
         return replacements;
     }
 
-    public Long[] getFeatureVectorForId(Long imageId) {
+    private Long[] getFeatureVectorForId(Long imageId) {
         return FeatureVectorMap.getInstance().getFeatureVectorForId(imageId);
     }
 
@@ -195,7 +129,7 @@ public class FeatureVectorService {
             output *= Math.cos(radians);
         }else
         {
-            System.out.println(" Invalid vector found");
+            System.out.println("Invalid vector found");
         }
         return output;
     }

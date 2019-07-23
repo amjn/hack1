@@ -1,5 +1,8 @@
 package com.example.ec;
 
+import com.example.ec.domain.FeatureSimilarity;
+import com.example.ec.domain.FeatureSimilarityMap;
+import com.example.ec.domain.FeatureVectorMap;
 import com.example.ec.domain.FeatureVectorWithType;
 import com.example.ec.service.FeatureVectorService;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -11,7 +14,11 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,50 +50,84 @@ public class ExplorecaliApplication implements CommandLineRunner {
      */
 	@Override
 	public void run(String... strings) throws Exception {
-		//Create the default tour packages
-//		tourPackageService.createTourPackage("BC", "Backpack Cal");
-		//featureVectorService.createFeatureVector( new FeatureVectorWithType(1l, new Long[]{1l,2l,3l}, 1l));
-		//featureVectorService.createFeatureVector( new FeatureVector(2l, new Long[]{1l,2l,3l}, 2l));
-		featureVectorService.readFileForImages();
-		featureVectorService.readFileForFeatureVectors();
+		readFileForImages();
+		readFileForFeatureVectors();
 		System.out.println("Number of feature vectors =" + featureVectorService.total());
 
-
-
-//		//Persist the Tours to the database
-//		importTours().forEach(t-> tourService.createTour(
-//				t.title,
-//				t.description,
-//				t.blurb,
-//				Integer.parseInt(t.price),
-//				t.length,
-//				t.bullets,
-//				t.keywords,
-//				t.packageType,
-//				Difficulty.valueOf(t.difficulty),
-//				Region.findByLabel(t.region)));
-//		System.out.println("Number of tours =" + tourService.total());
-
-
 	}
 
-	/**
-	 * Helper class to import the records in the ExploreCalifornia.json
-	 */
-	static class TourFromFile {
-		//attributes as listed in the .json file
-		private String packageType, title, description, blurb, price, length, bullets, keywords,  difficulty, region;
+	private void readFileForImages() {
+		String csvFile = "C:/Users/snvemula/IdeaProjects/hack1/IdAndSimilarIds.csv";
+		BufferedReader br = null;
+		String line = "";
+		String cvsSplitBy = ",";
+		FeatureSimilarityMap map = FeatureSimilarityMap.getInstance();
 
-		/**
-		 * Open the ExploreCalifornia.json, unmarshal every entry into a TourFromFile Object.
-		 *
-		 * @return a List of TourFromFile objects.
-		 * @throws IOException if ObjectMapper unable to open file.
-         */
-		static List<TourFromFile> importTours() throws IOException {
-			return new ObjectMapper().setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY).
-					readValue(TourFromFile.class.getResourceAsStream("/ExploreCalifornia.json"),new TypeReference<List<TourFromFile>>(){});
+		try {
+
+			br = new BufferedReader(new FileReader(csvFile));
+			while ((line = br.readLine()) != null) {
+
+				// use comma as separator
+				String[] imageIds = line.split(cvsSplitBy);
+				ArrayList<Long> similarIds = new ArrayList<>();
+				for(int i=1;i<imageIds.length;i++){
+					similarIds.add(Long.parseLong(imageIds[i]));
+				}
+				map.Get().put(Long.parseLong(imageIds[0]), new FeatureSimilarity(Long.parseLong(imageIds[0]), similarIds));
+
+			}
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		//list.Get();
+	}
+
+	private void readFileForFeatureVectors() {
+		String csvFile = "C:/Users/snvemula/IdeaProjects/hack1/IdAndFeatureVectors.csv";
+		BufferedReader br = null;
+		String line = "";
+		String cvsSplitBy = ",";
+		FeatureVectorMap map = FeatureVectorMap.getInstance();
+
+		try {
+
+			br = new BufferedReader(new FileReader(csvFile));
+			while ((line = br.readLine()) != null) {
+
+				// use comma as separator
+				String[] strings = line.split(cvsSplitBy);
+				Long[] fv = new Long[1024];
+				for(int i=1;i<strings.length-2;i++){
+					fv[i-1] = Long.parseLong(strings[i]);
+				}
+				map.Get().put(Long.parseLong(strings[0]), (new FeatureVectorWithType(fv, Long.parseLong(strings[strings.length-1]))));
+
+			}
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
-
 }
