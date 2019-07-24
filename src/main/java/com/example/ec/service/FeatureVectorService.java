@@ -113,38 +113,60 @@ public class FeatureVectorService {
                     .filter(x -> !x.getValue())
                     .collect(Collectors.toMap(x -> x.getKey(), x -> x.getValue()));
             List<String> unlikedIds = new ArrayList<> (collect.keySet());
-            for (String id : unlikedIds) {
-                Long[] fv = getFeatureVectorForId(id);
-                cosineTemp.set(getCosineSimilarity(likedFv, fv));
-                if (highestCosine == Double.MAX_VALUE) {
-                    highestCosine = cosineTemp.get();
-                    id1 = id;
-                } else if(secondHighestCosine == Double.MAX_VALUE) {
-                    if(highestCosine < cosineTemp.get()){
-                        double tempCosine = highestCosine;
-                        String tempId = id1;
-                        highestCosine = cosineTemp.get();
-                        id1 = id;
-                        secondHighestCosine = tempCosine;
-                        id2 = tempId;
-                    } else {
-                        secondHighestCosine = cosineTemp.get();
-                        id2 = id;
-                    }
-                } else if(cosineTemp.get() > highestCosine){
-                    double tempCosine = highestCosine;
-                    String tempId = id1;
-                    highestCosine = cosineTemp.get();
-                    id1 = id;
-                    secondHighestCosine = tempCosine;
-                    id2 = tempId;
-                } else if(cosineTemp.get() > secondHighestCosine) {
-                    secondHighestCosine = cosineTemp.get();
-                    id2 = id;
+
+            if (unlikedIds.contains(likedId))
+            {
+                unlikedIds.remove(likedId);
+            }
+
+            int rand1 = getRandomNumberInRange(0, unlikedIds.size() - 1);
+            replaceableIds.add(unlikedIds.get(rand1));
+            int rand2 = getRandomNumberInRange(0, unlikedIds.size() - 1);
+            if (rand2 != rand1)
+            {
+                replaceableIds.add(unlikedIds.get(rand2));
+            }
+            else
+            {
+                rand2 = getRandomNumberInRange(0, unlikedIds.size() - 1);
+                if (rand2 != rand1)
+                {
+                    replaceableIds.add(unlikedIds.get(rand2));
                 }
             }
-            replaceableIds.add(id1);
-            replaceableIds.add(id2);
+
+//            for (String id : unlikedIds) {
+//                Long[] fv = getFeatureVectorForId(id);
+//                cosineTemp.set(getCosineSimilarity(likedFv, fv));
+//                if (highestCosine == Double.MAX_VALUE) {
+//                    highestCosine = cosineTemp.get();
+//                    id1 = id;
+//                } else if(secondHighestCosine == Double.MAX_VALUE) {
+//                    if(highestCosine < cosineTemp.get()){
+//                        double tempCosine = highestCosine;
+//                        String tempId = id1;
+//                        highestCosine = cosineTemp.get();
+//                        id1 = id;
+//                        secondHighestCosine = tempCosine;
+//                        id2 = tempId;
+//                    } else {
+//                        secondHighestCosine = cosineTemp.get();
+//                        id2 = id;
+//                    }
+//                } else if(cosineTemp.get() > highestCosine){
+//                    double tempCosine = highestCosine;
+//                    String tempId = id1;
+//                    highestCosine = cosineTemp.get();
+//                    id1 = id;
+//                    secondHighestCosine = tempCosine;
+//                    id2 = tempId;
+//                } else if(cosineTemp.get() > secondHighestCosine) {
+//                    secondHighestCosine = cosineTemp.get();
+//                    id2 = id;
+//                }
+//            }
+//            replaceableIds.add(id1);
+//            replaceableIds.add(id2);
 
         }
         else if (numUnliked > 0 && numUnliked <= 2)
@@ -175,38 +197,59 @@ public class FeatureVectorService {
                     .filter(x -> !x.getValue())
                     .collect(Collectors.toMap(x -> x.getKey(), x -> x.getValue()));
             List<String> unlikedIds = new ArrayList<> (collect.keySet());
-            for (String id : unlikedIds) {
-                Long[] fv = getFeatureVectorForId(id);
-                cosineTemp.set(getCosineSimilarity(likedFv, fv));
-                if (leastCosine == Double.MIN_VALUE) {
-                    leastCosine = cosineTemp.get();
-                    id1 = id;
-                } else if(secondleastCosine == Double.MIN_VALUE) {
-                    if(leastCosine > cosineTemp.get()){
-                        double tempCosine = leastCosine;
-                        String tempId = id1;
-                        leastCosine = cosineTemp.get();
-                        id1 = id;
-                        secondleastCosine = tempCosine;
-                        id2 = tempId;
-                    } else {
-                        secondleastCosine = cosineTemp.get();
-                        id2 = id;
-                    }
-                } else if(cosineTemp.get() < leastCosine){
-                    double tempCosine = leastCosine;
-                    String tempId = id1;
-                    leastCosine = cosineTemp.get();
-                    id1 = id;
-                    secondleastCosine = tempCosine;
-                    id2 = tempId;
-                } else if(cosineTemp.get() < secondleastCosine) {
-                    secondleastCosine = cosineTemp.get();
-                    id2 = id;
+
+            if (unlikedIds.contains(dislikedId))
+            {
+                unlikedIds.remove(dislikedId);
+            }
+            int rand1 = getRandomNumberInRange(0, unlikedIds.size() - 1);
+            replaceableIds.add(unlikedIds.get(rand1));
+            int rand2 = getRandomNumberInRange(0, unlikedIds.size() - 1);
+            if (rand2 != rand1)
+            {
+                replaceableIds.add(unlikedIds.get(rand2));
+            }
+            else
+            {
+                rand2 = getRandomNumberInRange(0, unlikedIds.size() - 1);
+                if (rand2 != rand1)
+                {
+                    replaceableIds.add(unlikedIds.get(rand2));
                 }
             }
-            replaceableIds.add(id1);
-            replaceableIds.add(id2);
+
+//            for (String id : unlikedIds) {
+//                Long[] fv = getFeatureVectorForId(id);
+//                cosineTemp.set(getCosineSimilarity(likedFv, fv));
+//                if (leastCosine == Double.MIN_VALUE) {
+//                    leastCosine = cosineTemp.get();
+//                    id1 = id;
+//                } else if(secondleastCosine == Double.MIN_VALUE) {
+//                    if(leastCosine > cosineTemp.get()){
+//                        double tempCosine = leastCosine;
+//                        String tempId = id1;
+//                        leastCosine = cosineTemp.get();
+//                        id1 = id;
+//                        secondleastCosine = tempCosine;
+//                        id2 = tempId;
+//                    } else {
+//                        secondleastCosine = cosineTemp.get();
+//                        id2 = id;
+//                    }
+//                } else if(cosineTemp.get() < leastCosine){
+//                    double tempCosine = leastCosine;
+//                    String tempId = id1;
+//                    leastCosine = cosineTemp.get();
+//                    id1 = id;
+//                    secondleastCosine = tempCosine;
+//                    id2 = tempId;
+//                } else if(cosineTemp.get() < secondleastCosine) {
+//                    secondleastCosine = cosineTemp.get();
+//                    id2 = id;
+//                }
+//            }
+//            replaceableIds.add(id1);
+//            replaceableIds.add(id2);
 
         }
         else if (numUnliked > 0 && numUnliked <= 2)
@@ -221,20 +264,30 @@ public class FeatureVectorService {
         return replaceableIds;
     }
 
+    private int getRandomNumberInRange(int min, int max) {
+
+        if (min >= max) {
+            throw new IllegalArgumentException("max must be greater than min");
+        }
+
+        Random r = new Random();
+        return r.nextInt((max - min) + 1) + min;
+    }
+
     private double getCosineSimilarity(Long[] featureVector1, Long[] featureVector2)
     {
         double output = 0;
-        double degrees = 45.0;
-        double radians = Math.toRadians(degrees);
+        double sqSum1 = 0, sqSum2 = 0;
 
         if (featureVector1 != null && featureVector2 != null && featureVector1.length == featureVector2.length)
         {
-
             for (int i = 0; i < featureVector1.length-1; i++)
             {
                 output += featureVector1[i] * featureVector2[i];
+                sqSum1 += featureVector1[i] * featureVector1[i];
+                sqSum2 += featureVector2[i] * featureVector2[i];
             }
-            output *= Math.cos(radians);
+            output  = output / (Math.sqrt(sqSum1) * Math.sqrt(sqSum2));
         }else
         {
             System.out.println("Invalid vector found");
