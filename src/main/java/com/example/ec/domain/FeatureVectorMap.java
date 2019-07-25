@@ -26,7 +26,7 @@ public class FeatureVectorMap {
         return fvMap;
     }
 
-    public Long[] getFeatureVectorForId(String imageId) {
+    public double[] getFeatureVectorForId(String imageId) {
         if(fvMap.get(imageId) != null){
             return fvMap.get(imageId).getFeatureVector();
         } else {

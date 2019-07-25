@@ -11,7 +11,7 @@ public class FeatureVectorWithType {
     private Long id;
 
     @Column
-    private Long[] featureVector;
+    private double[] featureVector;
 
     @Column
     private Long type;
@@ -19,16 +19,16 @@ public class FeatureVectorWithType {
     public FeatureVectorWithType() {
     }
 
-    public FeatureVectorWithType(Long[] featureVector, Long type) {
+    public FeatureVectorWithType(double[] featureVector, Long type) {
         this.featureVector = featureVector;
         this.type = type;
     }
 
-    public Long[] getFeatureVector() {
+    public double[] getFeatureVector() {
         return featureVector;
     }
 
-    public void setFeatureVector(Long[] featureVector) {
+    public void setFeatureVector(double[] featureVector) {
         this.featureVector = featureVector;
     }
 

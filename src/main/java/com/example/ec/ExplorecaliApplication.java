@@ -128,9 +128,9 @@ public class ExplorecaliApplication implements CommandLineRunner {
 
 				// use comma as separator
 				String[] strings = line.split(cvsSplitBy);
-				Long[] fv = new Long[1024];
+				double[] fv = new double[2];
 				for(int i=1;i<strings.length-2;i++){
-					fv[i-1] = Long.parseLong(strings[i]);
+					fv[i-1] = Double.parseDouble(strings[i]);
 				}
 				map.Get().put(strings[0], (new FeatureVectorWithType(fv, Long.parseLong(strings[strings.length-1]))));
 
